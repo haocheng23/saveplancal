@@ -37,6 +37,9 @@ public class UserDaoImpl implements UserDao {
     public boolean login(User user) {
         String hsql = "FROM User u where u.name=? and u.password=?";
         System.out.println(hsql);
+//      如果配置了TranactionManager并且通过@Transactional或者声明的方式配置的事务边界，
+//      那么Spring会在开始事务之前通过AOP的方式为当前线程创建Session
+//      不应该调用SessionFactory的openSession()来获得Sessioin，因为这样获得的Session并没有被事务管理。
         Query query = sessionFactory.getCurrentSession().createQuery(hsql);
         query.setString(0, user.getName());
         query.setString(1,user.getPassword());

@@ -8,13 +8,22 @@
     <!-- 修改常量管理中的action工程，这个常量的使用，必须引入spring和struts的整合包，不然spring无法管理struts2 Action中的实体类-->
     <constant name="struts.objectFactory" value="spring"/>
 
-    <package name="user" namespace="/" extends="struts-default">
-        <!-- 此时method={1}中的{1}代表user_*中的*,即加入你访问路径是/user_m1，则此刻访问的是该Action中的m1方法。
-        同理，如果通配符* == delete,则就访问的是delete方法。当name中含有多个通配符的时候，method={2} ,就代表第二个通配符，同理以此类推。
-        这种方式更灵活的简化了struts.xml的配置文件。-->
-        <action name="user_*" class="userAction" method="{1}">
-            <result name="success">/success.jsp</result>
-            <result name="error">/error.jsp</result>
+    <!--<package name="user" namespace="/" extends="struts-default">-->
+        <!--&lt;!&ndash; 此时method={1}中的{1}代表user_*中的*,即加入你访问路径是/user_m1，则此刻访问的是该Action中的m1方法。-->
+        <!--同理，如果通配符* == delete,则就访问的是delete方法。当name中含有多个通配符的时候，method={2} ,就代表第二个通配符，同理以此类推。-->
+        <!--这种方式更灵活的简化了struts.xml的配置文件。&ndash;&gt;-->
+        <!--&lt;!&ndash; class的值不再是具体的Action类了，而是Spring中的实例bean &ndash;&gt;-->
+        <!--<action name="user_*" class="userAction" method="{1}">-->
+            <!--<result name="success">/success.jsp</result>-->
+            <!--<result name="error">/error.jsp</result>-->
+        <!--</action>-->
+
+    <!--</package>-->
+
+
+    <package name="rank" namespace="/" extends="struts-default">
+        <action name="rank" class="rankAction" method="getRank">
+            <!--<result name="success" type="json">/success.jsp</result>-->
         </action>
 
     </package>

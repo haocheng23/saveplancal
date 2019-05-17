@@ -4,93 +4,87 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
-  <!-- classpath -->
-  <context:property-placeholder location="classpath:db.properties" />
 
 
-  <!-- 使用annotation -->
-  <context:annotation-config/>
-  <!-- 使用annotation自动注册bean,并检查@Controller, @Service, @Repository注解已被注入 -->
-  <context:component-scan base-package="com.myfund.ssh.action"/>
-  <context:component-scan base-package="com.myfund.ssh.service"/>
-  <context:component-scan base-package="com.myfund.ssh.dao" />
+    <!-- 方法一 使用annotation-->
+    <context:annotation-config/>
+    <!-- 使用annotation自动注册bean,并检查@Controller, @Service, @Repository注解已被注入 -->
+    <context:component-scan base-package="com.myfund.ssh.action"/>
+    <context:component-scan base-package="com.myfund.ssh.service"/>
+    <context:component-scan base-package="com.myfund.ssh.dao"/>
 
 
-
-  <!-- data connection setting -->
-  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-    <property name="driverClass" value="${database.driverClassName}"></property>
-    <property name="jdbcUrl" value="${database.url}"></property>
-    <property name="user" value="${database.username}"></property>
-    <property name="password" value="${database.password}"></property>
-    <!-- 设置数据库连接池的最大连接数 -->
-    <property name="maxPoolSize">
-      <value>50</value>
-    </property>
-    <!-- 设置数据库连接池的最小连接数 -->
-    <property name="minPoolSize">
-      <value>5</value>
-    </property>
-    <!-- 设置数据库连接池的初始化连接数 -->
-    <property name="initialPoolSize">
-      <value>5</value>
-    </property>
-    <!-- 设置数据库连接池的连接最大空闲时间 -->
-    <property name="maxIdleTime">
-      <value>20</value>
-    </property>
-    <!-- c3p0缓存Statement的数量数 -->
-    <property name="maxStatements">
-      <value>50</value>
-    </property>
-    <!-- 当连接池里面的连接用完的时候,C3P0一下获取新的连接数 -->
-    <property name="acquireIncrement">
-      <value>20</value>
-    </property>
-  </bean>
+    <!-- 方法二 分别交给Spring IOC处理-->
+    <!--<bean id="userAction" class="com.myfund.ssh.action.UserAction" scope="prototype">-->
+        <!--<property name="userService" ref="userService"/>-->
+    <!--</bean>-->
+    <!--<bean id="userService" class="com.myfund.ssh.service.Impl.UserServiceImpl">-->
+        <!--<property name="userDao" ref="userDao"/>-->
+    <!--</bean>-->
+    <!--<bean id="userDao" class="com.myfund.ssh.dao.impl.UserDaoImpl">-->
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    <!--</bean>-->
 
 
-
-  <!-- hibernate 管理-->
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-    <!-- 引用上面设置的数据源 -->
-    <property name="dataSource">
-      <ref bean="dataSource" />
-    </property>
-
-    <property name="hibernateProperties">
-      <props>
-        <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-        <prop key="hibernate.autoReconnect">true</prop>
-        <prop key="hibernate.hbm2ddl.auto">update</prop>
-        <prop key="hibernate.show_sql">true</prop>
-        <prop key="hibernate.format_sql">true</prop>
-        <!-- 解决session关闭问题 -->
-        <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
-        <prop key="current_session_context_class">thread</prop>
-
-        <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
-        <prop key="hibernate.max_fetch_depth">3</prop>
-        <prop key="hibernate.connection.url">jdbc:mysql://localhost:3306/saveplancal</prop>
-        <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop>
-      </props>
-    </property>
+    <!-- 读取属性配置文件内容 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!-- 配置c3p0数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${sqlserver.driverClassName}"/>
+        <property name="jdbcUrl" value="${sqlserver.url}"/>
+        <property name="user" value="${sqlserver.username}"/>
+        <property name="password" value="${sqlserver.password}"/>
+        <!-- 设置数据库连接池的最大连接数 -->
+        <property name="maxPoolSize" value="50"/>
+        <!-- 设置数据库连接池的最小连接数 -->
+        <property name="minPoolSize" value="5"/>
+        <!-- 设置数据库连接池的初始化连接数 -->
+        <property name="initialPoolSize" value="5"/>
+        <!-- 设置数据库连接池的连接最大空闲时间 -->
+        <property name="maxIdleTime" value="20"/>
+        <!-- c3p0缓存Statement的数量数 -->
+        <property name="maxStatements" value="50"/>
+        <!-- 当连接池里面的连接用完的时候,C3P0一下获取新的连接数 -->
+        <property name="acquireIncrement" value="20"/>
+    </bean>
 
 
+    <!-- hibernate 管理, 配置session工厂-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <!-- 引用上面配置的数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!--<property name="configLocations" value="classpath:hibernate.cfg.xml"/>-->
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.autoReconnect">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <!-- 解决session关闭问题 -->
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+                <!-- 当前session运行的上下文 -->
+                <prop key="current_session_context_class">thread</prop>
 
-    <!-- 包扫描的方式加载注解类 -->
-    <property name="packagesToScan">
-      <list>
-        <value>com.myfund.ssh.entity</value>
-      </list>
-    </property>
-  </bean>
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                <prop key="hibernate.max_fetch_depth">3</prop>
+                <prop key="hibernate.connection.url">jdbc:sqlserver://10.20.34.122;DatabaseName=PrimaryData_New</prop>
+                <prop key="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</prop>
+            </props>
+        </property>
+
+        <!-- 包扫描的方式加载注解类 -->
+        <property name="packagesToScan">
+            <list>
+                <value>com.myfund.ssh.entity</value>
+            </list>
+        </property>
+    </bean>
 
 
-
-  <!-- 用注解来实现事物管理 -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-    <property name="sessionFactory" ref="sessionFactory" />
-  </bean>
-  <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    <!-- 用注解来实现事物管理 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 </beans>
